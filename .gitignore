@@ -35,3 +35,7 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+proxmox-tf/.envrc
+
+# Ignore log files
+proxmox-tf/terraform-plugin-proxmox.log
