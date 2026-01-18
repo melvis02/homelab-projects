@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fundfetti
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fundfetti
+  namespace: fundfetti
+  labels:
+    app: fundfetti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fundfetti
+  template:
+    metadata:
+      labels:
+        app: fundfetti
+    spec:
+      containers:
+      - name: fundfetti
+        image: ghcr.io/melvis02/fundfetti:latest # {"$imagepolicy": "fundfetti:fundfetti"}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080 # Assumption, will verify
+          name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fundfetti
+  namespace: fundfetti
+spec:
+  selector:
+    app: fundfetti
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fundfetti
+  namespace: fundfetti
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - fundfetti.treympick.me
+    secretName: fundfetti-tls
+  rules:
+  - host: fundfetti.treympick.me
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: fundfetti
+            port:
+              number: 80
