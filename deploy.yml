@@ -1,0 +1,68 @@
+---
+- name: Deploy K3s Cluster
+  import_playbook: k3s-ansible/playbooks/site.yml
+
+- name: Apply Kubernetes Manifests
+  hosts: server[0]
+  vars:
+    ansible_user: ubuntu
+    k3s_kubeconfig: /etc/rancher/k3s/k3s.yaml
+  tasks:
+    - name: Ensure .kube directory exists
+      file:
+        path: /home/{{ ansible_user }}/.kube
+        state: directory
+        owner: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Copy kubeconfig to user home
+      command: cp {{ k3s_kubeconfig }} /home/{{ ansible_user }}/.kube/config
+      become: true
+
+    - name: Fix kubeconfig permissions
+      file:
+        path: /home/{{ ansible_user }}/.kube/config
+        owner: "{{ ansible_user }}"
+        mode: '0600'
+      become: true
+
+    - name: Copy local manifests to remote
+      copy:
+        src: k8s/
+        dest: /home/{{ ansible_user }}/k8s-manifests/
+        owner: "{{ ansible_user }}"
+        mode: '0644'
+
+    - name: Install MetalLB
+      command: kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.12/config/manifests/metallb-native.yaml
+      environment:
+        KUBECONFIG: /home/{{ ansible_user }}/.kube/config
+      become: true
+      become_user: "{{ ansible_user }}"
+
+    - name: Install Cert-Manager
+      command: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.3/cert-manager.yaml
+      environment:
+        KUBECONFIG: /home/{{ ansible_user }}/.kube/config
+      become: true
+      become_user: "{{ ansible_user }}"
+
+    - name: Wait for CRDs to be established
+      command: sleep 30 
+      # A simple sleep is primitive but effective for CRD registration delay in simple playbooks.
+      # A better way would be using `kubectl wait` but CRD names vary.
+
+    - name: Label GPU node
+      command: kubectl label nodes k3s-gpu-node hardware-type=intel-gpu --overwrite
+      environment:
+        KUBECONFIG: /home/{{ ansible_user }}/.kube/config
+      become: true
+      become_user: "{{ ansible_user }}"
+      ignore_errors: true # Ignore if node doesn't exist yet or other minor issues
+
+    - name: Apply manifests
+      command: kubectl apply -f /home/{{ ansible_user }}/k8s-manifests/
+      environment:
+        KUBECONFIG: /home/{{ ansible_user }}/.kube/config
+      become: true
+      become_user: "{{ ansible_user }}"

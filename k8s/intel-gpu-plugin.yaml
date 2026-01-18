@@ -1,0 +1,39 @@
+# intel-gpu-plugin.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: intel-gpu-plugin
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: intel-gpu-plugin
+  template:
+    metadata:
+      labels:
+        name: intel-gpu-plugin
+    spec:
+      nodeSelector:
+        hardware-type: intel-gpu # Matches the label we planned earlier
+      containers:
+      - name: intel-gpu-plugin
+        image: intel/intel-gpu-plugin:0.30.0
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: devfs
+          mountPath: /dev/dri
+        - name: sysfs
+          mountPath: /sys/class/drm
+        - name: kubelet-sockets
+          mountPath: /var/lib/kubelet/device-plugins
+      volumes:
+      - name: devfs
+        hostPath:
+          path: /dev/dri
+      - name: sysfs
+        hostPath:
+          path: /sys/class/drm
+      - name: kubelet-sockets
+        hostPath:
+          path: /var/lib/kubelet/device-plugins

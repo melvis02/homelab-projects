@@ -39,3 +39,14 @@ proxmox-tf/.envrc
 
 # Ignore log files
 proxmox-tf/terraform-plugin-proxmox.log
+
+# Generated Ansible Inventory
+inventory.ini
+inventory.yml
+
+# Generated Kubeconfigs
+k3s.yaml
+proxmox-tf/k3s.yaml
+
+# Local env vars
+env-vars.txt

@@ -88,7 +88,7 @@ variable "vm_disk_size" {
 variable "k3s_node_ips" {
   description = "A list of IP addresses for the k3s nodes."
   type        = list(string)
-  default     = ["192.168.68.223/24", "192.168.68.224/24", "192.168.68.225/24"]
+  default     = ["192.168.71.1/24", "192.168.71.2/24", "192.168.71.3/24"]
 }
 
 variable "gateway_ip" {
