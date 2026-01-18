@@ -20,6 +20,8 @@ spec:
       labels:
         app: fundfetti
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: fundfetti
         image: ghcr.io/melvis02/fundfetti:latest # {"$imagepolicy": "fundfetti:fundfetti"}
