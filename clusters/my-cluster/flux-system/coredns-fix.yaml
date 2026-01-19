@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  # The .override extension is important as it's imported inside the main .:53 block
+  github.override: |
+    rewrite name github.com.treympick.me github.com
+    rewrite name ghcr.io.treympick.me ghcr.io
+    rewrite name objects.githubusercontent.com.treympick.me objects.githubusercontent.com
