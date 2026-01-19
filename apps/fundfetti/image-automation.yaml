@@ -6,6 +6,8 @@ metadata:
 spec:
   image: ghcr.io/melvis02/fundfetti
   interval: 1m0s
+  secretRef:
+    name: regcred
 ---
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImagePolicy
