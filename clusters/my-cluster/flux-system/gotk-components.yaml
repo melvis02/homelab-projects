@@ -11441,6 +11441,10 @@ spec:
         app.kubernetes.io/part-of: flux
         app.kubernetes.io/version: v2.7.5
     spec:
+      hostAliases:
+      - ip: "140.82.114.33"
+        hostnames:
+        - "ghcr.io"
       containers:
       - args:
         - --events-addr=http://notification-controller.$(RUNTIME_NAMESPACE).svc.cluster.local./
@@ -12379,6 +12383,10 @@ spec:
         app.kubernetes.io/part-of: flux
         app.kubernetes.io/version: v2.7.5
     spec:
+      hostAliases:
+      - ip: "140.82.113.4"
+        hostnames:
+        - "github.com"
       containers:
       - args:
         - --events-addr=http://notification-controller.$(RUNTIME_NAMESPACE).svc.cluster.local./
