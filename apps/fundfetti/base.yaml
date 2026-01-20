@@ -26,6 +26,19 @@ spec:
       - name: fundfetti
         image: ghcr.io/melvis02/fundfetti:0.0.2 # {"$imagepolicy": "fundfetti:fundfetti"}
         imagePullPolicy: Always
+        env:
+        - name: DB_DRIVER
+          value: "postgres"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: fundfetti-secret
+              key: DATABASE_URL
+        - name: SESSION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: fundfetti-secret
+              key: SESSION_KEY
         ports:
         - containerPort: 8080 # Assumption, will verify
           name: http

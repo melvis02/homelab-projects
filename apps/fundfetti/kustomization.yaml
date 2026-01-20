@@ -3,3 +3,5 @@ kind: Kustomization
 resources:
   - base.yaml
   - image-automation.yaml
+  - postgres.yaml
+  - secret.yaml
