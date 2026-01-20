@@ -24,7 +24,7 @@ spec:
       - name: regcred
       containers:
       - name: fundfetti
-        image: ghcr.io/melvis02/fundfetti:0.0.2 # {"$imagepolicy": "fundfetti:fundfetti"}
+        image: ghcr.io/melvis02/fundfetti:0.0.3 # {"$imagepolicy": "fundfetti:fundfetti"}
         imagePullPolicy: Always
         ports:
         - containerPort: 8080 # Assumption, will verify
