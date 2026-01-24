@@ -74,6 +74,17 @@ The cluster hosts **Channels DVR** with hardware transcoding enabled via Intel i
     *   The DVR Service has a dedicated LoadBalancer IP (`.101`) for direct port 8089 access.
     *   **Router Config**: Forward WAN:8089 to LAN:192.168.71.101:8089.
 
+    *   **Router Config**: Forward WAN:8089 to LAN:192.168.71.101:8089.
+
+### Initial Setup (Important)
+Accessing the DVR via the Ingress URL (`dvr.treympick.me`) before claiming the server will cause redirects to internal IPs during authentication.
+
+**Workaround:** Perform the initial claim via `kubectl port-forward`:
+1.  Forward port: `kubectl port-forward svc/channels-dvr 8089:8089`
+2.  Visit: `http://localhost:8089`
+3.  Click **Setup**, log in, and complete the claim.
+4.  Once claimed, you can use `https://dvr.treympick.me`.
+
 ### GPU Passthrough
 The `proxmox-vm-qemu` resource is configured with `hostpci` mapping for the Intel iGPU.
 *   See [docs/gpu-passthrough.md](docs/gpu-passthrough.md) for Host/Guest configuration details.

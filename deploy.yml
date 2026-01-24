@@ -23,6 +23,25 @@
         state: absent
         regexp: '^search.*treympick\.me'
 
+    - name: Install linux-modules-extra for GPU support
+      apt:
+        name: "linux-modules-extra-{{ ansible_kernel }}"
+        state: present
+        update_cache: yes
+      when: ansible_hostname == 'k3s-gpu-node'
+
+    - name: Ensure i915 module is loaded on boot
+      copy:
+        content: "i915\n"
+        dest: /etc/modules-load.d/i915.conf
+      when: ansible_hostname == 'k3s-gpu-node'
+
+    - name: Load i915 module
+      modprobe:
+        name: i915
+        state: present
+      when: ansible_hostname == 'k3s-gpu-node'
+
 - name: Deploy K3s Cluster
   import_playbook: k3s-ansible/playbooks/site.yml
 
