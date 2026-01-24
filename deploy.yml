@@ -1,4 +1,28 @@
 ---
+- name: Pre-configure Nodes
+  hosts: all
+  become: true
+  tasks:
+    - name: Disable nm-cloud-setup service
+      systemd:
+        name: nm-cloud-setup.service
+        enabled: no
+        state: stopped
+      ignore_errors: true
+
+    - name: Disable nm-cloud-setup timer
+      systemd:
+        name: nm-cloud-setup.timer
+        enabled: no
+        state: stopped
+      ignore_errors: true
+
+    - name: Remove search domain from resolv.conf
+      lineinfile:
+        path: /etc/resolv.conf
+        state: absent
+        regexp: '^search.*treympick\.me'
+
 - name: Deploy K3s Cluster
   import_playbook: k3s-ansible/playbooks/site.yml
 

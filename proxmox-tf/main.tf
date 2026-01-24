@@ -73,7 +73,8 @@ resource "proxmox_vm_qemu" "k3s_server" {
   os_type = "cloud-init"
 
   # Use the first IP from your list
-  ipconfig0   = "ip=${var.k3s_node_ips[0]},gw=${var.gateway_ip}"
+  nameserver  = "1.1.1.1 8.8.8.8"
+  ipconfig0   = "ip=${var.k3s_node_ips[0]}${var.subnet_cidr},gw=${var.gateway_ip}"
   
   sshkeys   = var.ssh_public_key
   ciuser    = var.vm_user
@@ -153,7 +154,9 @@ resource "proxmox_vm_qemu" "k3s_gpu_node" {
   os_type = "cloud-init"
 
   # Use the first IP from your list
-  ipconfig0   = "ip=${var.k3s_node_ips[1]},gw=${var.gateway_ip}"
+  # Use the first IP from your list
+  nameserver  = "1.1.1.1 8.8.8.8"
+  ipconfig0   = "ip=${var.k3s_node_ips[1]}${var.subnet_cidr},gw=${var.gateway_ip}"
   
   sshkeys   = var.ssh_public_key
   ciuser    = var.vm_user
@@ -177,9 +180,9 @@ resource "proxmox_vm_qemu" "k3s_gpu_node" {
 # worker nodes
 resource "proxmox_vm_qemu" "k3s_node" {
   # We start from index 1 to skip the IP used by the GPU node
-  for_each    = toset(slice(var.k3s_node_ips, 2, var.k3s_nodes))
+  count = var.k3s_nodes - 2
 
-  name        = "k3s-node-${index(var.k3s_node_ips, each.value) + 1}"
+  name        = "k3s-node-${count.index + 3}"
   target_node = var.proxmox_host    # Proxmox node name
   clone       = var.template_name   # Template VM name
 
@@ -223,7 +226,9 @@ resource "proxmox_vm_qemu" "k3s_node" {
   }
 
   os_type = "cloud-init"
-  ipconfig0 = "ip=${each.value},gw=${var.gateway_ip}"
+
+  nameserver = "1.1.1.1 8.8.8.8"
+  ipconfig0 = "ip=${var.k3s_node_ips[count.index + 2]}${var.subnet_cidr},gw=${var.gateway_ip}"
   sshkeys   = var.ssh_public_key
   ciuser    = var.vm_user
   # It is recommended to use SSH keys for authentication instead of passwords.
@@ -246,7 +251,7 @@ resource "proxmox_vm_qemu" "k3s_node" {
 output "k3s_all_ips" {
   value = concat(
     [proxmox_vm_qemu.k3s_gpu_node.default_ipv4_address],
-    [for node in values(proxmox_vm_qemu.k3s_node) : node.default_ipv4_address]
+    proxmox_vm_qemu.k3s_node[*].default_ipv4_address
   )
 }
 

@@ -64,7 +64,7 @@ variable "k3s_nodes" {
 variable "vm_cpu_cores" {
   description = "The number of CPU cores for each VM."
   type        = number
-  default     = 1
+  default     = 2
 }
 
 variable "vm_cpu_sockets" {
@@ -88,7 +88,13 @@ variable "vm_disk_size" {
 variable "k3s_node_ips" {
   description = "A list of IP addresses for the k3s nodes."
   type        = list(string)
-  default     = ["192.168.71.1/24", "192.168.71.2/24", "192.168.71.3/24"]
+  default     = ["192.168.71.1", "192.168.71.2", "192.168.71.3"]
+}
+
+variable "subnet_cidr" {
+  description = "The CIDR block for the k3s nodes (e.g., /24, /22)."
+  type        = string
+  default     = "/22"
 }
 
 variable "gateway_ip" {
