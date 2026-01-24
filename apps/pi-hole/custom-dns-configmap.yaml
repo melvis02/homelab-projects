@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: pi-hole-custom-dns
-  namespace: pi-hole
-data:
-  99-custom.conf: |
-    address=/pihole.treympick.me/192.168.71.100

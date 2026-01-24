@@ -27,8 +27,6 @@ spec:
                 secretKeyRef:
                   name: pi-hole-secret
                   key: WEBPASSWORD
-            - name: DNSMASQ_LISTENING
-              value: "all"
           ports:
             - containerPort: 53
               name: dns-tcp
@@ -45,8 +43,8 @@ spec:
             - name: etc-dnsmasq
               mountPath: /etc/dnsmasq.d
             - name: custom-dns
-              mountPath: /etc/dnsmasq.d/99-custom.conf
-              subPath: 99-custom.conf
+              mountPath: /etc/pihole/custom.list
+              subPath: custom.list
       volumes:
         - name: etc-pihole
           persistentVolumeClaim:
