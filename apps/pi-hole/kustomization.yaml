@@ -8,4 +8,5 @@ resources:
   - service.yaml
   - ingress.yaml
   - middleware.yaml
+  - custom-dns-configmap.yaml
 
