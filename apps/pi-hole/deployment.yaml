@@ -27,6 +27,8 @@ spec:
                 secretKeyRef:
                   name: pi-hole-secret
                   key: WEBPASSWORD
+            - name: DNSMASQ_LISTENING
+              value: "all"
           ports:
             - containerPort: 53
               name: dns-tcp
