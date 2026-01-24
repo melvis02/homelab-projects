@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: channels-dvr
+  namespace: channels-dvr
+  labels:
+    app: channels-dvr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: channels-dvr
+  template:
+    metadata:
+      labels:
+        app: channels-dvr
+    spec:
+      nodeSelector:
+        hardware-type: intel-gpu
+      containers:
+      - name: channels-dvr
+        image: fancybits/channels-dvr:latest
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+        resources:
+          limits:
+            gpu.intel.com/i915: 1
+        ports:
+        - containerPort: 8089
+          name: http
+        env:
+        - name: TZ
+          value: "America/Chicago"
+        volumeMounts:
+        - name: config
+          mountPath: /channels-dvr
+        - name: recordings
+          mountPath: /shares/DVR
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: channels-dvr-config
+      - name: recordings
+        persistentVolumeClaim:
+          claimName: channels-dvr-recordings
