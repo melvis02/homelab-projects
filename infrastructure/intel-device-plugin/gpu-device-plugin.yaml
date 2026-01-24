@@ -1,0 +1,8 @@
+apiVersion: deviceplugin.intel.com/v1
+kind: GpuDevicePlugin
+metadata:
+  name: intel-gpu
+  namespace: intel-device-plugins
+spec:
+  nodeSelector:
+    hardware-type: intel-gpu

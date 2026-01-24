@@ -1,13 +1,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: intel-device-plugins-gpu
+  name: intel-device-plugins-operator
   namespace: intel-device-plugins
 spec:
   interval: 1h
   chart:
     spec:
-      chart: intel-device-plugins-gpu
+      chart: intel-device-plugins-operator
       version: "0.34.1" # Pinned version or latest stable
       sourceRef:
         kind: HelmRepository
