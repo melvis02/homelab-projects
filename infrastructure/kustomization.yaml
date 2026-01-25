@@ -6,3 +6,4 @@ resources:
   - traefik
   - local-path-provisioner
   - intel-device-plugin
+  - cloudflare-tunnel
