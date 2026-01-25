@@ -88,3 +88,41 @@ See [docs/gpu-passthrough.md](docs/gpu-passthrough.md) for the specific image sc
 *   `docs/`: Detailed hardware and setup guides.
     *   [gpu-passthrough.md](docs/gpu-passthrough.md)
     *   [talos-guide.md](docs/talos-guide.md)
+
+---
+
+## 🚀 Deploying New Applications
+
+This cluster follows a GitOps workflow using **FluxCD**. To deploy a new application:
+
+### 1. Create Application Manifests
+Create a new directory in `apps/` for your application and include your Kubernetes manifests (Deployment, Service, Ingress, etc.).
+
+Example: `apps/my-new-app/`
+
+### 2. Add to Kustomization
+Add the new directory to the `resources` list in [apps/kustomization.yaml](file:///Users/treympick/Projects/homelab-projects/apps/kustomization.yaml):
+
+```yaml
+resources:
+  - fundfetti
+  - pi-hole
+  - channels-dvr
+  - my-new-app # Add this line
+```
+
+### 3. Commit and Push
+Once you push your changes to GitHub, Flux will automatically detect the changes and synchronize them to the cluster.
+
+```bash
+git add .
+git commit -m "feat: deploy my-new-app"
+git push origin main
+```
+
+### 4. Verify Sync
+You can monitor the sync progress using the Flux CLI:
+
+```bash
+flux get kustomizations --watch
+```
