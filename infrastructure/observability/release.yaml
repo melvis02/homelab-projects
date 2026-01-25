@@ -37,6 +37,7 @@ spec:
             volumeMounts:
               - name: prometheus-kube-prometheus-stack-prometheus-db
                 mountPath: /prometheus
+                subPath: prometheus-db
         storageSpec:
           volumeClaimTemplate:
             spec:
