@@ -48,6 +48,12 @@ spec:
                   storage: 10Gi
     grafana:
       adminPassword: admin # User should change this
+      ingress:
+        enabled: true
+        ingressClassName: traefik
+        hosts:
+          - grafana.treympick.me
+        path: /
       persistence:
         enabled: true
         storageClassName: local-path
