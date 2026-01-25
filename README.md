@@ -82,3 +82,5 @@ See [docs/gpu-passthrough.md](docs/gpu-passthrough.md) for the specific image sc
 *   `apps/`: Application manifests (Channels DVR, Pi-hole, Fundfetti).
 *   `clusters/talos-home/`: Flux configuration for the home cluster.
 *   `docs/`: Detailed hardware and setup guides.
+    *   [gpu-passthrough.md](docs/gpu-passthrough.md)
+    *   [talos-guide.md](docs/talos-guide.md)
