@@ -7,7 +7,7 @@ This project uses **OpenTofu** (via Terraform) to provision Virtual Machines on 
 
 ### Architecture
 *   **Infrastructure**: [OpenTofu](proxmox-talos-tf/) provisioning 3 VMs (1 Control Plane, 2 Workers) running Talos Linux.
-*   **GitOps**: [FluxCD](clusters/talos-home/) manages cluster state by synchronizing manifests from this repository.
+*   **GitOps**: [FluxCD](clusters/talos-homelab/) manages cluster state by synchronizing manifests from this repository.
 *   **Hardware Setup**: Intel iGPU (UHD 620) passthrough via custom Talos Image Factory builds.
 *   **Ingress & Routing**: [Cloudflare Tunnel](infrastructure/cloudflare-tunnel/) for secure external exposure, [Traefik](infrastructure/traefik/) for internal routing.
 *   **Services**:
@@ -45,7 +45,7 @@ flux bootstrap github \
   --owner=$GITHUB_USER \
   --repository=homelab-projects \
   --branch=main \
-  --path=./clusters/talos-home \
+  --path=./clusters/talos-homelab \
   --personal
 ```
 
@@ -80,7 +80,7 @@ See [docs/gpu-passthrough.md](docs/gpu-passthrough.md) for the specific image sc
 *   `proxmox-talos-tf/`: OpenTofu code for Talos VMs.
 *   `infrastructure/`: Core cluster services (MetalLB, Traefik, Cert-Manager, Cloudflare-Tunnel).
 *   `apps/`: Application manifests (Channels DVR, Pi-hole, Fundfetti).
-*   `clusters/talos-home/`: Flux configuration for the home cluster.
+*   `clusters/talos-homelab/`: Flux configuration for the home cluster.
 *   `docs/`: Detailed hardware and setup guides.
     *   [gpu-passthrough.md](docs/gpu-passthrough.md)
     *   [talos-guide.md](docs/talos-guide.md)
