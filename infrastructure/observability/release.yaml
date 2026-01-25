@@ -1,0 +1,49 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: monitoring
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: "69.1.0" # Use a recent stable version
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    prometheus:
+      prometheusSpec:
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: local-path
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 10Gi
+    grafana:
+      adminPassword: admin # User should change this
+      persistence:
+        enabled: true
+        storageClassName: local-path
+        size: 5Gi
+    alertmanager:
+      alertmanagerSpec:
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: local-path
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 5Gi

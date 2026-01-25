@@ -7,3 +7,4 @@ resources:
   - local-path-provisioner
   - intel-device-plugin
   - cloudflare-tunnel
+  - observability
