@@ -3,14 +3,8 @@ kind: Ingress
 metadata:
   name: pi-hole
   namespace: pi-hole
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
 spec:
   ingressClassName: traefik
-  tls:
-    - hosts:
-        - pihole.treympick.me
-      secretName: pihole-tls
   rules:
     - host: pihole.treympick.me
       http:

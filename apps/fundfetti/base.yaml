@@ -64,14 +64,8 @@ kind: Ingress
 metadata:
   name: fundfetti
   namespace: fundfetti
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
 spec:
   ingressClassName: traefik
-  tls:
-  - hosts:
-    - fundfetti.treympick.me
-    secretName: fundfetti-tls
   rules:
   - host: fundfetti.treympick.me
     http:

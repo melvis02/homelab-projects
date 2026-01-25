@@ -3,22 +3,6 @@ kind: Ingress
 metadata:
   name: channels-dvr
   namespace: channels-dvr
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
 spec:
   ingressClassName: traefik
   rules:
-  - host: dvr.treympick.me
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: channels-dvr
-            port:
-              number: 8089
-  tls:
-  - hosts:
-    - dvr.treympick.me
-    secretName: channels-dvr-tls
