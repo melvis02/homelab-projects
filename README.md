@@ -64,7 +64,11 @@ The cluster hosts **Channels DVR** with hardware transcoding enabled via Intel i
 
 ### Access Methods
 1.  **Web UI (HTTPS)**: `https://dvr.treympick.me` (Routed via Cloudflare Tunnel -> Traefik).
-2.  **Remote Apps**: Standard Cloudflare Tunnel routing.
+2.  **Local Access (Port Forward)**: If the vanity domain is not yet active or for initial setup:
+    ```bash
+    kubectl port-forward svc/channels-dvr 8089:8089 -n channels-dvr
+    ```
+3.  **Remote Apps**: Standard Cloudflare Tunnel routing.
 
 ### GPU Passthrough
 The Talos nodes run a custom image generated via [Talos Image Factory](https://factory.talos.dev/) including:
