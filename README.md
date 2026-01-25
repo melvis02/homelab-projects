@@ -1,17 +1,19 @@
 # Homelab Projects 🔧
 
-Infrastructure as Code (IaC) repository for my Proxmox Homelab and Kubernetes cluster.
+Infrastructure as Code (IaC) repository for my Proxmox Homelab and Kubernetes cluster managed by **Talos Linux** and **FluxCD**.
 
 ## Overview
-This project uses **Terraform** (via OpenTofu) to provision Virtual Machines on Proxmox and **Ansible** to configure them as a K3s Kubernetes cluster. It hosts services like **Channels DVR** with hardware transcoding support.
+This project uses **OpenTofu** (via Terraform) to provision Virtual Machines on Proxmox and **Talos Linux** to manage the Kubernetes cluster. The cluster is managed using **GitOps** principles via **FluxCD**, hosting services like **Channels DVR** with hardware transcoding support.
 
-### Components
-*   **Infrastructure**: [Terraform/OpenTofu](proxmox-tf/) provisioning 3 VMs (1 Control Plane, 2 Workers).
-*   **Configuration**: [Ansible](deploy.yml) playbook using the official `k3s-ansible` role.
-*   **Hardware Setup**: [GPU Passthrough](docs/gpu-passthrough.md) handling for Intel iGPU (UHD 620).
-*   **Kubernetes Services**:
-    *   **Networking**: MetalLB (LoadBalancer) + Traefik (Ingress) + Cert-Manager (Let's Encrypt).
-    *   **Apps**: Channels DVR.
+### Architecture
+*   **Infrastructure**: [OpenTofu](proxmox-talos-tf/) provisioning 3 VMs (1 Control Plane, 2 Workers) running Talos Linux.
+*   **GitOps**: [FluxCD](clusters/talos-home/) manages cluster state by synchronizing manifests from this repository.
+*   **Hardware Setup**: Intel iGPU (UHD 620) passthrough via custom Talos Image Factory builds.
+*   **Ingress & Routing**: [Cloudflare Tunnel](infrastructure/cloudflare-tunnel/) for secure external exposure, [Traefik](infrastructure/traefik/) for internal routing.
+*   **Services**:
+    *   **Networking**: MetalLB + Traefik.
+    *   **Security**: Cert-Manager + Cloudflare Tunnels.
+    *   **Apps**: Channels DVR, Pi-hole, Fundfetti.
 
 ---
 
@@ -19,81 +21,64 @@ This project uses **Terraform** (via OpenTofu) to provision Virtual Machines on 
 
 ### Prerequisites
 *   Proxmox VE 8.x
-*   [OpenTofu](https://opentofu.org/) (Terraform fork)
-*   [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
-*   `sshpass` (optional, for Ansible password auth if needed)
+*   [OpenTofu](https://opentofu.org/)
+*   [Talosctl](https://www.talos.dev/latest/introduction/getting-started/#installing-talosctl)
+*   [Flux CLI](https://fluxcd.io/flux/installation/)
 *   Configured Proxmox API Token.
 
-### 1. Provision Infrastructure (Terraform)
-Navigate to the Terraform directory and apply the configuration.
+### 1. Provision Infrastructure (OpenTofu)
+Navigate to the `proxmox-talos-tf` directory and apply the configuration.
 
 ```bash
-cd proxmox-tf
-
-# Initialize and Apply
+cd proxmox-talos-tf
 tofu init
 tofu apply
 ```
 
-> **Note**: You must provide your Proxmox credentials. Create a `terraform.tfvars` file (see `terraform.tfvars.example`) or use environment variables (`TF_VAR_PM_API_TOKEN_ID`, etc.).
+> **Note**: This provisions bare Talos nodes. You will need a custom Talos image with Intel iGPU drivers. See [docs/gpu-passthrough.md](docs/gpu-passthrough.md).
 
-### 2. Generate Ansible Inventory
-We use a helper script to convert Terraform outputs into an Ansible-compatible inventory.
-
-```bash
-# Inside proxmox-tf/
-./generate_inventory.sh
-```
-This creates `../inventory.yml` in the project root.
-
-### 3. Configure Cluster (Ansible)
-Run the master playbook to install K3s, configure networking, and deploy applications.
+### 2. Bootstrap Flux CD
+Once the cluster is initialized, bootstrap Flux to sync the repository.
 
 ```bash
-cd ..
-ansible-playbook deploy.yml
+flux bootstrap github \
+  --owner=$GITHUB_USER \
+  --repository=homelab-projects \
+  --branch=main \
+  --path=./clusters/talos-home \
+  --personal
 ```
 
-**What `deploy.yml` does:**
-1.  **Bootstrap K3s**: Uses `k3s-ansible` submodule to install master/agent nodes.
-2.  **Dependencies**: Installs `MetalLB` and `Cert-Manager` CRDs.
-3.  **GPU Setup**: Labels the GPU node so the Intel Device Plugin works.
-4.  **Manifests**: Applies local manifests from `k8s/` (Channels DVR, Ingress, etc.).
+### 3. Configure Cloudflare Tunnel
+The tunnel secret is managed manually (not in Git). Create the secret in the `cloudflare-tunnel` namespace:
+
+```bash
+kubectl create secret -n cloudflare-tunnel generic cloudflare-tunnel-token --from-literal=token=YOUR_TOKEN
+```
 
 ---
 
 ## 📺 Channels DVR & GPU
 
-The cluster hosts **Channels DVR** with hardware transcoding enabled via Intel iGPU passthrough on `k3s-gpu-node`.
+The cluster hosts **Channels DVR** with hardware transcoding enabled via Intel iGPU passthrough.
 
 ### Access Methods
-1.  **Web UI (HTTPS)**: `https://dvr.treympick.me`
-    *   Routed via Traefik Ingress (Port 443).
-    *   Secured by Let's Encrypt.
-2.  **Remote Apps**: `PublicIP:8089` -> `192.168.71.101:8089`
-    *   The DVR Service has a dedicated LoadBalancer IP (`.101`) for direct port 8089 access.
-    *   **Router Config**: Forward WAN:8089 to LAN:192.168.71.101:8089.
-
-    *   **Router Config**: Forward WAN:8089 to LAN:192.168.71.101:8089.
-
-### Initial Setup (Important)
-Accessing the DVR via the Ingress URL (`dvr.treympick.me`) before claiming the server will cause redirects to internal IPs during authentication.
-
-**Workaround:** Perform the initial claim via `kubectl port-forward`:
-1.  Forward port: `kubectl port-forward svc/channels-dvr 8089:8089`
-2.  Visit: `http://localhost:8089`
-3.  Click **Setup**, log in, and complete the claim.
-4.  Once claimed, you can use `https://dvr.treympick.me`.
+1.  **Web UI (HTTPS)**: `https://dvr.treympick.me` (Routed via Cloudflare Tunnel -> Traefik).
+2.  **Remote Apps**: Standard Cloudflare Tunnel routing.
 
 ### GPU Passthrough
-The `proxmox-vm-qemu` resource is configured with `hostpci` mapping for the Intel iGPU.
-*   See [docs/gpu-passthrough.md](docs/gpu-passthrough.md) for Host/Guest configuration details.
+The Talos nodes run a custom image generated via [Talos Image Factory](https://factory.talos.dev/) including:
+- `i915-ucode`
+- `intel-ucode`
+- `nonfree-kmod-intel-gvt-g` (if using GVT-g)
+
+See [docs/gpu-passthrough.md](docs/gpu-passthrough.md) for the specific image schematic and configuration.
 
 ---
 
 ## Directory Structure
-*   `proxmox-tf/`: Terraform HCL code.
-*   `k3s-ansible/`: Git submodule of the official [k3s-io/k3s-ansible](https://github.com/k3s-io/k3s-ansible) repo.
-*   `k8s/`: Kubernetes manifests (Deployments, PVCs, Services).
-*   `deploy.yml`: Master Ansible playbook.
-*   `ansible.cfg`: Configures Ansible to find roles in the submodule.
+*   `proxmox-talos-tf/`: OpenTofu code for Talos VMs.
+*   `infrastructure/`: Core cluster services (MetalLB, Traefik, Cert-Manager, Cloudflare-Tunnel).
+*   `apps/`: Application manifests (Channels DVR, Pi-hole, Fundfetti).
+*   `clusters/talos-home/`: Flux configuration for the home cluster.
+*   `docs/`: Detailed hardware and setup guides.

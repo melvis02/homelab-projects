@@ -1,56 +1,69 @@
-# Proxmox Intel iGPU Passthrough Guide
+# Proxmox Intel iGPU Passthrough Guide (Talos Linux)
 
-This guide documents the configuration required to pass through an Intel UHD 620 (or similar) iGPU to an Ubuntu guest on Proxmox using Terraform.
+This guide documents the configuration required to pass through an Intel UHD 620 (or similar) iGPU to a **Talos Linux** guest on Proxmox.
 
-## 1. Proxmox Host Configuration (Prerequisites)
-Before using Terraform, the Proxmox host must be configured to allow IOMMU and prevent the host from claiming the GPU.
+## 1. Proxmox Host Configuration
+The Proxmox host must be configured to allow IOMMU and prevent the host from claiming the GPU.
 
 *   **BIOS/UEFI**: Enable `VT-d` / `IOMMU`.
 *   **Kernel Command Line** (`/etc/default/grub`):
     *   Add: `intel_iommu=on iommu=pt`
     *   Run `update-grub` and reboot.
-*   **Modules** (`/etc/modules`):
-    *   Add: `vfio`, `vfio_iommu_type1`, `vfio_pci`.
-*   **Blacklist** (`/etc/modprobe.d/blacklist.conf`):
-    *   Add: `blacklist i915` (prevents host from using the GPU).
 *   **Resource Mapping**:
     *   Create a PCI Resource Mapping in Proxmox UI (`Datacenter` -> `Resource Mappings`).
-    *   Name: `igpu` (or match `main.tf`).
-    *   ID: `0000:00:02.0` (Use `lspci` to verify).
+    *   Name: `igpu`.
+    *   ID: `0000:00:02.0` (Verify with `lspci`).
 
-## 2. Terraform Configuration (`main.tf`)
-Use the `pci` block (or `hostpci` if preferred, but `pci` is used here) with the Resource Mapping.
+## 2. Talos Image Factory (Custom Image)
+Talos requires a custom image containing the `i915` firmware and kernel modules.
 
-> **Note**: The `args` parameter (`x-igd-opregion=on`) technically fixes some issues but requires root. We use `primary_gpu = true` (which enables `x-vga`) as a supported alternative.
+1.  Visit [Talos Image Factory](https://factory.talos.dev/).
+2.  Select your Hardware (e.g., `amd64`).
+3.  Select Talos version.
+4.  Add the following extensions:
+    - `siderolabs/i915-ucode`
+    - `siderolabs/intel-ucode`
+    - `siderolabs/intel-gpu-firmware` (if available/needed for your generation)
+5.  Download the **ISO** or **Maintenance** image URL and use it in your OpenTofu configuration.
+
+## 3. OpenTofu Configuration (`main.tf`)
+Configure the `pci` block to use the mapping. Ensure `machine = "q35"`.
 
 ```hcl
   pci {
     id          = 0
-    mapping_id  = "igpu"   # Must match Proxmox Resource Mapping name
+    mapping_id  = "igpu"
     rombar      = true
-    pcie        = true     # Required for 'q35' machine type
-    primary_gpu = true     # critical: sets x-vga=on, helps guest init
+    pcie        = true
+    primary_gpu = true
   }
 ```
 
-**Permission Requirements:**
-*   The Terraform user/token must have `Mapping.Use` permission on `/mapping/pci/igpu`.
+## 4. Talos Configuration (Machine Config)
+To ensure the `i915` driver loads and the devices are accessible in Kubernetes:
 
-## 3. VM Guest Configuration (Ubuntu)
-**CRITICAL:** Cloud images and minimal installs often lack the `extra` kernel modules properly.
+### Kernel Modules
+Add `i915` to the extra kernel modules in your machine config:
 
-If `ls -l /dev/dri` is missing but `lspci` shows the device:
-1.  **Install Extras**:
-    ```bash
-    sudo apt update
-    sudo apt install -y linux-modules-extra-$(uname -r)
-    ```
-2.  **Load Driver**:
-    ```bash
-    sudo modprobe i915
-    ```
-3.  **Verify**:
-    ```bash
-    ls -l /dev/dri
-    # Should show card0 and renderD128
-    ```
+```yaml
+machine:
+  kernel:
+    modules:
+      - name: i915
+```
+
+### Device Plugins
+Install the [Intel Device Plugin for Kubernetes](https://github.com/intel/intel-device-plugins-for-kubernetes) via Flux to expose the GPU to pods.
+
+```bash
+# Verify on a node
+talosctl -n <node-ip> ssh -- kmsg | grep i915
+```
+
+## 5. Verifying Passthrough in Pods
+Check for `/dev/dri/renderD128` inside the container:
+
+```bash
+kubectl exec -it <pod-name> -- ls -l /dev/dri
+# Should show card0 and renderD128
+```
