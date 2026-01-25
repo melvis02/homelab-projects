@@ -6,3 +6,13 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
+  - host: dvr.treympick.me
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: channels-dvr
+            port:
+              number: 8089
