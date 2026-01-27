@@ -58,6 +58,12 @@ spec:
         enabled: true
         storageClassName: local-path
         size: 5Gi
+      additionalDataSources:
+        - name: Loki
+          type: loki
+          url: http://loki-stack.monitoring.svc.cluster.local:3100/
+          access: proxy
+          isDefault: false
     alertmanager:
       alertmanagerSpec:
         securityContext:
