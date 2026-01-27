@@ -50,3 +50,6 @@ proxmox-tf/k3s.yaml
 
 # Local env vars
 env-vars.txt
+
+# Valid Age keys
+*.agekey

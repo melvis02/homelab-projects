@@ -43,6 +43,13 @@ spec:
             secretKeyRef:
               name: fundfetti-secret
               key: SESSION_KEY
+        - name: RESEND_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: fundfetti-secret
+              key: RESEND_API_KEY
+        - name: FROM_EMAIL
+          value: "orders@fundfetti.treympick.me"
         ports:
         - containerPort: 8080 # Assumption, will verify
           name: http
