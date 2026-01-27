@@ -59,7 +59,7 @@ spec:
         storageClassName: local-path
         size: 5Gi
       additionalDataSources:
-        - name: Loki
+        - name: Loki-Flux
           type: loki
           url: http://loki-stack.monitoring.svc.cluster.local:3100
           access: proxy
