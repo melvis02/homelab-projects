@@ -17,6 +17,8 @@ spec:
     createNamespace: true
   values:
     loki:
+      image:
+        tag: 2.9.3
       enabled: true
       persistence:
         enabled: true

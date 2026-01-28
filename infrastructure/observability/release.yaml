@@ -65,7 +65,8 @@ spec:
           url: http://loki-stack.monitoring.svc.cluster.local:3100
           access: proxy
           editable: true
-          version: 1
+          jsonData:
+            version: "1"
           isDefault: false
     alertmanager:
       alertmanagerSpec:
