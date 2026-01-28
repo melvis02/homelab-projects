@@ -1,46 +1,47 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: channels-dvr
-  namespace: channels-dvr
+  name: plex
+  namespace: plex
   labels:
-    app: channels-dvr
+    app: plex
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: channels-dvr
+      app: plex
   template:
     metadata:
       labels:
-        app: channels-dvr
+        app: plex
     spec:
       nodeSelector:
         hardware-type: intel-gpu
       containers:
-      - name: channels-dvr
-        image: fancybits/channels-dvr:latest
+      - name: plex
+        image: plexinc/pms-docker:latest
         imagePullPolicy: IfNotPresent
-        securityContext:
-          privileged: true
         resources:
           limits:
             gpu.intel.com/i915: 1
         ports:
-        - containerPort: 8089
+        - containerPort: 32400
           name: http
         env:
         - name: TZ
           value: "America/Chicago"
+        # The following claim token might be needed for first setup, uncomment and populate if necessary
+        # - name: PLEX_CLAIM
+        #   value: "claim-xxxx"
         volumeMounts:
         - name: config
-          mountPath: /channels-dvr
-        - name: recordings
-          mountPath: /shares/DVR
+          mountPath: /config
+        - name: media
+          mountPath: /data
       volumes:
       - name: config
         persistentVolumeClaim:
-          claimName: channels-dvr-config
-      - name: recordings
+          claimName: plex-config
+      - name: media
         persistentVolumeClaim:
-          claimName: channels-dvr-recordings
+          claimName: plex-media

@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - fundfetti
   - pi-hole
-  - channels-dvr
+  - plex

@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: channels-dvr
-  namespace: channels-dvr
+  name: plex
+  namespace: plex
 spec:
   ingressClassName: traefik
   rules:
@@ -13,6 +13,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: channels-dvr
+            name: plex
             port:
-              number: 8089
+              number: 32400
