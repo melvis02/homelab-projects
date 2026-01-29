@@ -30,6 +30,8 @@ spec:
         env:
         - name: TZ
           value: "America/Chicago"
+        - name: ADVERTISE_IP
+          value: "http://192.168.71.102:32400"
         # The following claim token might be needed for first setup, uncomment and populate if necessary
         # - name: PLEX_CLAIM
         #   value: "claim-xxxx"
