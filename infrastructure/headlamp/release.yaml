@@ -22,7 +22,7 @@ spec:
         - host: headlamp.treympick.me
           paths:
             - path: /
-              type: ImplementationSpecific
+              type: Prefix
     persistentVolumeClaim:
       enabled: true
       accessModes:
