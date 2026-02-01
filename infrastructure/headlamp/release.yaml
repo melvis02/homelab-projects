@@ -1,0 +1,61 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: headlamp
+  namespace: kube-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: headlamp
+      version: "0.29.0" # Using a recent version, will double check if needed
+      sourceRef:
+        kind: HelmRepository
+        name: headlamp
+        namespace: flux-system
+      interval: 1h
+  values:
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      hosts:
+        - host: headlamp.treympick.me
+          paths:
+            - path: /
+              type: ImplementationSpecific
+    persistentVolumeClaim:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+      storageClassName: local-path
+    
+    # Enable Flux plugin if available via values or if it needs to be configured
+    # Checking docs, plugins might be separate or via config. 
+    # For now deploying base and will check plugin config options. 
+    # Usually headlamp detects kubeconfig. 
+    
+    # Headlamp configuration
+    config:
+      oidc:
+        enabled: false
+    
+    # Plugin Configuration
+    initContainers:
+      - name: plugin-flux
+        image: ghcr.io/headlamp-k8s/headlamp-plugin-flux:latest
+        command:
+          - /bin/sh
+          - -c
+          - mkdir -p /build/plugins && cp -r /plugins/* /build/plugins/
+        volumeMounts:
+          - name: headlamp-plugins
+            mountPath: /build/plugins
+    
+    volumeMounts:
+      - name: headlamp-plugins
+        mountPath: /headlamp/plugins
+        
+    volumes:
+      - name: headlamp-plugins
+        emptyDir: {}

@@ -8,3 +8,4 @@ resources:
   - intel-device-plugin
   - cloudflare-tunnel
   - observability
+  - headlamp
