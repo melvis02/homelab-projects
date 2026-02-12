@@ -37,6 +37,7 @@ override.tf.json
 terraform.rc
 proxmox-tf/.envrc
 proxmox-talos-tf/.envrc
+.envrc
 
 # Ignore log files
 proxmox-tf/terraform-plugin-proxmox.log
