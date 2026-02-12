@@ -9,3 +9,4 @@ resources:
   - cloudflare-tunnel
   - observability
   - headlamp
+  - metrics-server
