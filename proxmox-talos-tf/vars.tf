@@ -115,3 +115,15 @@ variable "worker_macs" {
   type        = list(string)
   default     = ["bc:24:11:d4:c8:aa", "bc:24:11:40:e1:cb"]
 }
+
+variable "oidc_issuer_url" {
+  description = "The OIDC issuer URL."
+  type        = string
+  default     = ""
+}
+
+variable "oidc_client_id" {
+  description = "The OIDC client ID."
+  type        = string
+  default     = ""
+}

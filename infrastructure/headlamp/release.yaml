@@ -14,9 +14,14 @@ spec:
         name: headlamp
         namespace: flux-system
       interval: 1h
+  valuesFrom:
+    - kind: Secret
+      name: headlamp-oidc-values
   values:
     ingress:
       enabled: true
+      annotations:
+        traefik.ingress.kubernetes.io/router.middlewares: kube-system-headlamp-https-redirect@kubernetescrd
       ingressClassName: traefik
       hosts:
         - host: headlamp.treympick.me
@@ -24,7 +29,7 @@ spec:
             - path: /
               type: Prefix
     persistentVolumeClaim:
-      enabled: true
+      enabled: false
       accessModes:
         - ReadWriteOnce
       size: 1Gi

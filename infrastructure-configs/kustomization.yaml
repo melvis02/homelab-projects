@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - metallb
   - intel-gpu-device-plugin.yaml
+  - rbac.yaml

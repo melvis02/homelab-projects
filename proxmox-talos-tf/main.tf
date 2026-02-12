@@ -33,6 +33,20 @@ resource "talos_machine_configuration_apply" "controlplane" {
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
   node                        = var.control_plane_ips[count.index]
   depends_on                  = [proxmox_vm_qemu.control_plane]
+  config_patches = var.oidc_issuer_url != "" ? [
+    yamlencode({
+      cluster = {
+        apiServer = {
+          extraArgs = {
+            oidc-issuer-url     = var.oidc_issuer_url
+            oidc-client-id      = var.oidc_client_id
+            oidc-username-claim = "email"
+            oidc-groups-claim   = "groups"
+          }
+        }
+      }
+    })
+  ] : []
 }
 
 resource "talos_machine_configuration_apply" "worker" {
