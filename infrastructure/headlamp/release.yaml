@@ -22,12 +22,17 @@ spec:
       enabled: true
       annotations:
         traefik.ingress.kubernetes.io/router.middlewares: kube-system-headlamp-https-redirect@kubernetescrd
+        cert-manager.io/cluster-issuer: letsencrypt-prod
       ingressClassName: traefik
       hosts:
         - host: headlamp.treympick.me
           paths:
             - path: /
-              type: Prefix
+              type: ImplementationSpecific
+      tls:
+        - secretName: headlamp-tls
+          hosts:
+            - headlamp.treympick.me
     persistentVolumeClaim:
       enabled: false
       accessModes:

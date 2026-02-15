@@ -51,9 +51,15 @@ spec:
       ingress:
         enabled: true
         ingressClassName: traefik
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
         hosts:
           - grafana.treympick.me
         path: /
+        tls:
+          - secretName: grafana-tls
+            hosts:
+              - grafana.treympick.me
       persistence:
         enabled: true
         storageClassName: local-path
