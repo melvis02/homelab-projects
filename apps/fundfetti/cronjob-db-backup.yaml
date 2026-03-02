@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fundfetti-db-backup
+  namespace: fundfetti
+spec:
+  schedule: "0 2 * * *" # Runs every day at 2:00 AM server time
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: alpine:3.19
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Install necessary tools
+              apk add --no-cache postgresql-client aws-cli
+              
+              # Generate filename with timestamp
+              FILENAME="fundfetti_backup_$(date +%Y%m%d_%H%M%S).sql.gz"
+              echo "Starting database dump for $FILENAME..."
+              
+              # Dump and compress
+              pg_dump $DATABASE_URL | gzip > /tmp/$FILENAME
+              
+              echo "Uploading to Cloudflare R2..."
+              # Upload to R2 using the S3 compatibility API
+              AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID \
+              AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY \
+              aws s3 cp /tmp/$FILENAME s3://$R2_BUCKET_NAME/$FILENAME \
+                --endpoint-url $R2_ENDPOINT_URL \
+                --region auto
+                
+              echo "Backup complete!"
+            env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: fundfetti-secret
+                  key: DATABASE_URL
+            - name: R2_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: fundfetti-secret
+                  key: R2_ACCESS_KEY_ID
+            - name: R2_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fundfetti-secret
+                  key: R2_SECRET_ACCESS_KEY
+            - name: R2_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: fundfetti-secret
+                  key: R2_BUCKET_NAME
+            - name: R2_ENDPOINT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: fundfetti-secret
+                  key: R2_ENDPOINT_URL
+          restartPolicy: OnFailure
