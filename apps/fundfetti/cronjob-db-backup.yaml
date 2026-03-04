@@ -4,7 +4,7 @@ metadata:
   name: fundfetti-db-backup
   namespace: fundfetti
 spec:
-  schedule: "0 2 * * *" # Runs every day at 2:00 AM server time
+  schedule: "0 */4 * * *" # Runs every 4 hours (00:00, 04:00, 08:00, 12:00, 16:00, 20:00) server time
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
   jobTemplate:
