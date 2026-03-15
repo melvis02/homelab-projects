@@ -48,6 +48,16 @@ spec:
             secretKeyRef:
               name: fundfetti-secret
               key: RESEND_API_KEY
+        - name: GOOGLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: fundfetti-secret
+              key: GOOGLE_CLIENT_ID
+        - name: GOOGLE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: fundfetti-secret
+              key: GOOGLE_CLIENT_SECRET
         - name: FROM_EMAIL
           value: "orders@fundfetti.org"
         ports:
