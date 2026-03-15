@@ -28,7 +28,7 @@ spec:
       - name: regcred
       containers:
       - name: fundfetti
-        image: ghcr.io/melvis02/fundfetti:0.1.5 # {"$imagepolicy": "fundfetti:fundfetti"}
+        image: ghcr.io/melvis02/fundfetti:0.1.6 # {"$imagepolicy": "fundfetti:fundfetti"}
         imagePullPolicy: Always
         env:
         - name: DB_DRIVER
