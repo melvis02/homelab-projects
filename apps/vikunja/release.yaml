@@ -22,6 +22,9 @@ spec:
       retries: 3
   values:
     vikunja:
+      image:
+        repository: vikunja/vikunja
+        tag: "2.3.0"
       persistence:
         database:
           enabled: false
