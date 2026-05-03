@@ -1,0 +1,48 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vikunja
+  namespace: vikunja
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: vikunja
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: vikunja
+        namespace: vikunja
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    vikunja:
+      persistence:
+        database:
+          enabled: false
+      ingress:
+        main:
+          enabled: true
+          className: traefik
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-prod
+            nginx.ingress.kubernetes.io/proxy-body-size: "0"
+          hosts:
+            - host: tasks.treympick.me
+              paths:
+                - path: /
+          tls:
+            - secretName: vikunja-tls
+              hosts:
+                - tasks.treympick.me
+      env:
+        VIKUNJA_DATABASE_TYPE: "postgres"
+        VIKUNJA_SERVICE_PUBLICURL: "https://tasks.treympick.me"
+      envFrom:
+        - secretRef:
+            name: vikunja-secret
