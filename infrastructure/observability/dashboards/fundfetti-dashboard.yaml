@@ -1,0 +1,356 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fundfetti-orders-dashboard
+  namespace: monitoring
+  labels:
+    # This label is exactly what tells the sidecar to automatically import it!
+    grafana_dashboard: "1" 
+data:
+  fundfetti-orders-dashboard.json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 281,
+      "links": [],
+      "panels": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "cfi85re70an7ka"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 8,
+            "x": 0,
+            "y": 0
+          },
+          "id": 1,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calc": "lastNotNull",
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "postgres",
+                "uid": "cfi85re70an7ka"
+              },
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT count(DISTINCT o.id) AS \"Total Orders\" FROM orders o WHERE o.campaign_id IN ($campaign);",
+              "refId": "A"
+            }
+          ],
+          "title": "Total Orders",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "cfi85re70an7ka"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 8,
+            "x": 8,
+            "y": 0
+          },
+          "id": 2,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calc": "lastNotNull",
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "postgres",
+                "uid": "cfi85re70an7ka"
+              },
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT COALESCE(sum(oi.quantity), 0) AS \"Items Sold\" FROM order_items oi JOIN orders o ON o.id = oi.order_id WHERE o.campaign_id IN ($campaign);",
+              "refId": "A"
+            }
+          ],
+          "title": "Total Items Sold",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "cfi85re70an7ka"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "currencyUSD"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 8,
+            "x": 16,
+            "y": 0
+          },
+          "id": 3,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calc": "lastNotNull",
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "postgres",
+                "uid": "cfi85re70an7ka"
+              },
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT COALESCE(sum(oi.quantity * COALESCE(p.price_cents, 0)), 0) / 100.0 AS \"Estimated Revenue\" FROM order_items oi JOIN orders o ON o.id = oi.order_id LEFT JOIN products p ON p.id = oi.product_id WHERE o.campaign_id IN ($campaign);",
+              "refId": "A"
+            }
+          ],
+          "title": "Estimated Revenue",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "cfi85re70an7ka"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "filterable": true,
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 15,
+            "w": 24,
+            "x": 0,
+            "y": 5
+          },
+          "id": 4,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true,
+            "sortBy": []
+          },
+          "pluginVersion": "11.4.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "postgres",
+                "uid": "cfi85re70an7ka"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \n    c.name AS \"Campaign\",\n    o.id AS \"Order ID\", \n    o.name AS \"Customer Name\", \n    o.email AS \"Email\", \n    o.student_name AS \"Student\",\n    oi.product_name AS \"Item Name\", \n    oi.quantity AS \"Qty\"\nFROM orders o\nJOIN order_items oi ON o.id = oi.order_id\nJOIN campaigns c ON c.id = o.campaign_id\nWHERE o.campaign_id IN ($campaign)\nORDER BY o.id;",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Campaign Order Details",
+          "type": "table"
+        }
+      ],
+      "preload": false,
+      "refresh": "",
+      "schemaVersion": 40,
+      "tags": [
+        "fundfetti"
+      ],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "text": [
+                "Huegel Lion King Kids Flower Sale"
+              ],
+              "value": [
+                "4"
+              ]
+            },
+            "datasource": {
+              "type": "postgres",
+              "uid": "cfi85re70an7ka"
+            },
+            "definition": "SELECT name AS __text, id AS __value FROM campaigns ORDER BY name;",
+            "includeAll": true,
+            "multi": true,
+            "name": "campaign",
+            "options": [],
+            "query": "SELECT name AS __text, id AS __value FROM campaigns ORDER BY name;",
+            "refresh": 1,
+            "regex": "",
+            "type": "query"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "Fundfetti Orders Drilldown",
+      "uid": "fundfetti-orders-drilldown",
+      "version": 3,
+      "weekStart": ""
+    }
