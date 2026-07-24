@@ -35,7 +35,7 @@ variable "resource_pool_name" {
 variable "talos_iso" {
   description = "The location of the Talos ISO image in Proxmox storage."
   type        = string
-  default     = "local:iso/talos-v1.12.2-metal-amd64.iso"
+  default     = "local:iso/talos-v1.13.6-metal-amd64.iso"
 }
 
 variable "vm_cpu_cores" {
@@ -65,7 +65,7 @@ variable "control_plane_ips" {
 variable "worker_ips" {
   description = "List of IPs for worker nodes."
   type        = list(string)
-  default     = ["192.168.71.11", "192.168.71.12"]
+  default     = ["192.168.71.102", "192.168.71.12"]
 }
 
 variable "subnet_cidr" {

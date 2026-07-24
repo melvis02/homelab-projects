@@ -12,5 +12,5 @@ resource "talos_image_factory_schematic" "gpu" {
 }
 
 output "gpu_installer_url" {
-  value = "factory.talos.dev/installer/${talos_image_factory_schematic.gpu.id}:v1.12.0"
+  value = "factory.talos.dev/installer/${talos_image_factory_schematic.gpu.id}:v1.13.6"
 }
