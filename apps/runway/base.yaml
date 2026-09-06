@@ -42,7 +42,7 @@ spec:
       - name: regcred
       containers:
       - name: runway
-        image: ghcr.io/melvis02/runway:0.1.1 # {"$imagepolicy": "runway:runway"}
+        image: ghcr.io/melvis02/runway:0.1.2 # {"$imagepolicy": "runway:runway"}
         imagePullPolicy: Always
         env:
         - name: HOST
