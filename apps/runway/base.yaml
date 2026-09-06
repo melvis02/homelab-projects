@@ -7,18 +7,6 @@ metadata:
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/warn: privileged
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: runway-data
-  namespace: runway
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,9 +15,12 @@ metadata:
   labels:
     app: runway
 spec:
-  replicas: 1
+  replicas: 2
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: runway
@@ -49,8 +40,6 @@ spec:
           value: "0.0.0.0"
         - name: PORT
           value: "8080"
-        - name: DATABASE_PATH
-          value: "/app/.data/finances.db"
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
@@ -59,9 +48,6 @@ spec:
         ports:
         - containerPort: 8080
           name: http
-        volumeMounts:
-        - name: data
-          mountPath: /app/.data
         livenessProbe:
           httpGet:
             path: /api/summary
@@ -81,10 +67,6 @@ spec:
           limits:
             cpu: 500m
             memory: 256Mi
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: runway-data
 ---
 apiVersion: v1
 kind: Service
