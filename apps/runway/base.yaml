@@ -42,7 +42,7 @@ spec:
       - name: regcred
       containers:
       - name: runway
-        image: ghcr.io/melvis02/runway:0.1.2 # {"$imagepolicy": "runway:runway"}
+        image: ghcr.io/melvis02/runway:0.1.3 # {"$imagepolicy": "runway:runway"}
         imagePullPolicy: Always
         env:
         - name: HOST
@@ -51,6 +51,11 @@ spec:
           value: "8080"
         - name: DATABASE_PATH
           value: "/app/.data/finances.db"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: runway-secret
+              key: DATABASE_URL
         ports:
         - containerPort: 8080
           name: http
