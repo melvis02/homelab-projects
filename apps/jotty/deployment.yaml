@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jotty
+  namespace: jotty
+  labels:
+    app: jotty
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: jotty
+  template:
+    metadata:
+      labels:
+        app: jotty
+    spec:
+      initContainers:
+      - name: init-permissions
+        image: busybox:latest
+        command: ["sh", "-c", "mkdir -p /app/data /app/config && chown -R 1000:1000 /app/data /app/config"]
+        volumeMounts:
+        - name: jotty-data
+          mountPath: /app/data
+        - name: jotty-config
+          mountPath: /app/config
+        securityContext:
+          runAsUser: 0
+      containers:
+      - name: jotty
+        image: ghcr.io/fccview/jotty:latest
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: APP_URL
+          value: "https://jotty.treympick.me"
+        - name: HTTPS
+          value: "true"
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: SSO_FALLBACK_LOCAL
+          value: "yes"
+        - name: AUTH_MODE
+          valueFrom:
+            secretKeyRef:
+              name: jotty-secret
+              key: AUTH_MODE
+        - name: OIDC_ISSUER
+          valueFrom:
+            secretKeyRef:
+              name: jotty-secret
+              key: OIDC_ISSUER
+        - name: OIDC_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: jotty-secret
+              key: OIDC_CLIENT_ID
+        - name: OIDC_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: jotty-secret
+              key: OIDC_CLIENT_SECRET
+        ports:
+        - containerPort: 3000
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        volumeMounts:
+        - name: jotty-data
+          mountPath: /app/data
+        - name: jotty-config
+          mountPath: /app/config
+      volumes:
+      - name: jotty-data
+        persistentVolumeClaim:
+          claimName: jotty-data
+      - name: jotty-config
+        persistentVolumeClaim:
+          claimName: jotty-config
