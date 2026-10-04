@@ -25,8 +25,12 @@ spec:
         image: plexinc/pms-docker:latest
         imagePullPolicy: IfNotPresent
         resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
           limits:
             gpu.intel.com/i915: 1
+            memory: 2048Mi
         ports:
         - containerPort: 32400
           name: http

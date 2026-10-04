@@ -29,6 +29,13 @@ spec:
       labels:
         app: runway
     spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: runway
       imagePullSecrets:
       - name: regcred
       containers:

@@ -66,3 +66,9 @@ spec:
     service:
       type: ClusterIP
       port: 8123
+    resources:
+      requests:
+        cpu: 50m
+        memory: 250Mi
+      limits:
+        memory: 1024Mi

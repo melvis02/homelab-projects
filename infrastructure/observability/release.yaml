@@ -31,12 +31,19 @@ spec:
         initContainers:
           - name: fix-permissions
             image: busybox
-            command: ["sh", "-c", "mkdir -p /prometheus/prometheus-db && chown -R 1000:2000 /prometheus/prometheus-db"]
+            command: ["sh", "-c", "chown -R 1000:2000 /prometheus && chmod -R 777 /prometheus"]
             securityContext:
               runAsUser: 0
             volumeMounts:
               - name: prometheus-kube-prometheus-stack-prometheus-db
                 mountPath: /prometheus
+                subPath: prometheus-db
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            memory: 1536Mi
         storageSpec:
           volumeClaimTemplate:
             spec:
@@ -74,6 +81,12 @@ spec:
         enabled: true
         storageClassName: local-path
         size: 5Gi
+      resources:
+        requests:
+          cpu: 50m
+          memory: 200Mi
+        limits:
+          memory: 512Mi
       additionalDataSources:
         - name: loki
           uid: cfbegvgiw28lcd
@@ -100,6 +113,12 @@ spec:
             volumeMounts:
               - name: alertmanager-kube-prometheus-stack-alertmanager-db
                 mountPath: /alertmanager
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            memory: 128Mi
         storageSpec:
           volumeClaimTemplate:
             spec:

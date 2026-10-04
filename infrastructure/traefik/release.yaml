@@ -20,6 +20,12 @@ spec:
     disableWait: true
   targetNamespace: traefik-system
   values:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        memory: 256Mi
     ingressClass:
       enabled: true
       isDefaultClass: true

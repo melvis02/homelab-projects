@@ -24,12 +24,25 @@ spec:
       labels:
         app: fundfetti
     spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: fundfetti
       imagePullSecrets:
       - name: regcred
       containers:
       - name: fundfetti
         image: ghcr.io/melvis02/fundfetti:0.3.1 # {"$imagepolicy": "fundfetti:fundfetti"}
         imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 20m
+            memory: 32Mi
+          limits:
+            memory: 128Mi
         env:
         - name: DB_DRIVER
           value: "postgres"
