@@ -22,5 +22,24 @@ spec:
   values:
     controller:
       logLevel: info
+      resources:
+        requests:
+          cpu: 20m
+          memory: 50Mi
+        limits:
+          memory: 100Mi
     speaker:
       logLevel: info
+      resources:
+        requests:
+          cpu: 20m
+          memory: 50Mi
+        limits:
+          memory: 100Mi
+      frr:
+        resources:
+          requests:
+            cpu: 20m
+            memory: 40Mi
+          limits:
+            memory: 100Mi

@@ -16,6 +16,12 @@ spec:
     createNamespace: true
   targetNamespace: local-path-storage
   values:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 20Mi
+      limits:
+        memory: 64Mi
     storageClass:
       defaultClass: true
       create: true

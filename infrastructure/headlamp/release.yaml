@@ -39,6 +39,22 @@ spec:
         - ReadWriteOnce
       size: 1Gi
       storageClassName: local-path
+    resources:
+      requests:
+        cpu: 20m
+        memory: 32Mi
+      limits:
+        memory: 128Mi
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+                - key: hardware-type
+                  operator: NotIn
+                  values:
+                    - intel-gpu
     
     # Enable Flux plugin if available via values or if it needs to be configured
     # Checking docs, plugins might be separate or via config. 

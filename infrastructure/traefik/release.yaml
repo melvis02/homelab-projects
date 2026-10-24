@@ -26,6 +26,16 @@ spec:
         memory: 100Mi
       limits:
         memory: 256Mi
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+                - key: hardware-type
+                  operator: NotIn
+                  values:
+                    - intel-gpu
     ingressClass:
       enabled: true
       isDefaultClass: true
