@@ -22,6 +22,8 @@ spec:
           env:
             - name: TZ
               value: "America/Chicago"
+            - name: DNSMASQ_LISTENING
+              value: "all"
             - name: WEBPASSWORD
               valueFrom:
                 secretKeyRef:
