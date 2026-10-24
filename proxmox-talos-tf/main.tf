@@ -166,7 +166,7 @@ resource "proxmox_vm_qemu" "gpu_worker" {
 
   disk {
     slot    = "scsi0"
-    size    = var.vm_disk_size
+    size    = "100G"
     storage = "local-lvm"
     iothread = true
   }
