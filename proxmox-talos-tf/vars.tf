@@ -35,7 +35,7 @@ variable "resource_pool_name" {
 variable "talos_iso" {
   description = "The location of the Talos ISO image in Proxmox storage."
   type        = string
-  default     = "local:iso/talos-v1.13.6-metal-amd64.iso"
+  default     = "local:iso/talos-v1.14.4-metal-amd64.iso"
 }
 
 variable "vm_cpu_cores" {

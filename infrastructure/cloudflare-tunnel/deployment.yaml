@@ -20,9 +20,20 @@ spec:
         labelSelector:
           matchLabels:
             app: cloudflared
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
       containers:
       - name: cloudflared
-        image: cloudflare/cloudflared:latest
+        image: cloudflare/cloudflared:2026.10.3
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
         args:
         - tunnel
         - "--no-autoupdate"
