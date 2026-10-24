@@ -119,11 +119,11 @@ variable "worker_macs" {
 variable "oidc_issuer_url" {
   description = "The OIDC issuer URL."
   type        = string
-  default     = ""
+  default     = "https://accounts.google.com"
 }
 
 variable "oidc_client_id" {
   description = "The OIDC client ID."
   type        = string
-  default     = ""
+  default     = "48709509454-f76nhhmhdlacs2sc08tkuu8t2e4vcc8n.apps.googleusercontent.com"
 }
