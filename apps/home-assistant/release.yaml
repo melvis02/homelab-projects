@@ -37,6 +37,12 @@ spec:
         homeassistant:
           external_url: "https://home.treympick.me"
           internal_url: "http://home-assistant.home-assistant.svc.cluster.local:8123"
+        http:
+          use_x_forwarded_for: true
+          trusted_proxies:
+            - 10.244.0.0/16
+          ip_ban_enabled: true
+          login_attempts_threshold: 5
     ingress:
       enabled: true
       className: traefik
