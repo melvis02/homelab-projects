@@ -20,7 +20,7 @@ This project uses **OpenTofu** (via Terraform) to provision Virtual Machines on 
 ## 🚀 Getting Started
 
 ### Prerequisites
-*   Proxmox VE 8.x
+*   Proxmox VE 9.x
 *   [OpenTofu](https://opentofu.org/)
 *   [Talosctl](https://www.talos.dev/latest/introduction/getting-started/#installing-talosctl)
 *   [Flux CLI](https://fluxcd.io/flux/installation/)
