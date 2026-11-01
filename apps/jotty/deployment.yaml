@@ -19,7 +19,7 @@ spec:
     spec:
       initContainers:
       - name: init-permissions
-        image: busybox:latest
+        image: busybox:1.37.0
         command: ["sh", "-c", "mkdir -p /app/data /app/config && chown -R 1000:1000 /app/data /app/config"]
         volumeMounts:
         - name: jotty-data

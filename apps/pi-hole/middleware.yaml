@@ -4,7 +4,7 @@ metadata:
   name: internal-only
   namespace: pi-hole
 spec:
-  ipWhiteList:
+  ipAllowList:
     sourceRange:
       - 127.0.0.1/32
       - 192.168.0.0/16

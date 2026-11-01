@@ -5,3 +5,4 @@ resources:
   - image-automation.yaml
   - postgres.yaml
   - secret.yaml
+  - cronjob-db-backup.yaml

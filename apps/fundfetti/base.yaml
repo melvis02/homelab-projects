@@ -3,9 +3,9 @@ kind: Namespace
 metadata:
   name: fundfetti
   labels:
-    pod-security.kubernetes.io/enforce: privileged
-    pod-security.kubernetes.io/audit: privileged
-    pod-security.kubernetes.io/warn: privileged
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/warn: baseline
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -24,6 +24,15 @@ spec:
       labels:
         app: fundfetti
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: fundfetti
+              topologyKey: kubernetes.io/hostname
       topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
@@ -37,6 +46,18 @@ spec:
       - name: fundfetti
         image: ghcr.io/melvis02/fundfetti:0.3.1 # {"$imagepolicy": "fundfetti:fundfetti"}
         imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 10
         resources:
           requests:
             cpu: 20m

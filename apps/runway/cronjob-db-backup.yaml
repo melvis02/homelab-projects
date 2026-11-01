@@ -1,0 +1,68 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: runway-db-backup
+  namespace: runway
+spec:
+  schedule: "30 */4 * * *" # Runs every 4 hours at :30 (staggered from fundfetti)
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: alpine:3.21
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+            command:
+            - /bin/sh
+            - -c
+            - |
+              apk add --no-cache postgresql-client aws-cli
+              
+              FILENAME="runway_backup_$(date +%Y%m%d_%H%M%S).sql.gz"
+              echo "Starting database dump for $FILENAME..."
+              
+              pg_dump $DATABASE_URL | gzip > /tmp/$FILENAME
+              
+              echo "Uploading to Cloudflare R2..."
+              AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID \
+              AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY \
+              aws s3 cp /tmp/$FILENAME s3://$R2_BUCKET_NAME/$FILENAME \
+                --endpoint-url $R2_ENDPOINT_URL \
+                --region auto
+                
+              echo "Backup complete!"
+            env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: runway-secret
+                  key: DATABASE_URL
+            - name: R2_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: runway-secret
+                  key: R2_ACCESS_KEY_ID
+            - name: R2_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: runway-secret
+                  key: R2_SECRET_ACCESS_KEY
+            - name: R2_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: runway-secret
+                  key: R2_BUCKET_NAME
+            - name: R2_ENDPOINT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: runway-secret
+                  key: R2_ENDPOINT_URL
+          restartPolicy: OnFailure

@@ -30,7 +30,7 @@ spec:
           runAsNonRoot: false # Allow initContainer to run as root
         initContainers:
           - name: fix-permissions
-            image: busybox
+            image: busybox:1.37.0
             command: ["sh", "-c", "chown -R 1000:2000 /prometheus && chmod -R 777 /prometheus"]
             securityContext:
               runAsUser: 0
@@ -53,10 +53,13 @@ spec:
                 requests:
                   storage: 10Gi
     grafana:
-      adminPassword: admin # User should change this
+      admin:
+        existingSecret: grafana-admin-credentials
+        userKey: admin-user
+        passwordKey: admin-password
       grafana.ini:
         auth.anonymous:
-          enabled: true
+          enabled: false
           org_role: Viewer
         auth.proxy:
           enabled: true
@@ -106,7 +109,7 @@ spec:
           runAsNonRoot: false
         initContainers:
           - name: fix-permissions
-            image: busybox
+            image: busybox:1.37.0
             command: ["sh", "-c", "chown -R 1000:2000 /alertmanager"]
             securityContext:
               runAsUser: 0

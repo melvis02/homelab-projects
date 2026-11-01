@@ -13,6 +13,15 @@ spec:
       labels:
         app: cloudflared
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: cloudflared
+              topologyKey: kubernetes.io/hostname
       topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
@@ -27,7 +36,7 @@ spec:
         fsGroup: 65532
       containers:
       - name: cloudflared
-        image: cloudflare/cloudflared:2026.10.5
+        image: cloudflare/cloudflared:2026.10.7
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true

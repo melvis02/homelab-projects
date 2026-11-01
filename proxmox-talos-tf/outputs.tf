@@ -21,5 +21,8 @@ output "control_plane_macs" {
 }
 
 output "worker_macs" {
-  value = proxmox_vm_qemu.worker[*].network[0].macaddr
+  value = concat(
+    proxmox_vm_qemu.gpu_worker[*].network[0].macaddr,
+    proxmox_vm_qemu.worker[*].network[0].macaddr
+  )
 }

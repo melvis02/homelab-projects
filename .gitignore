@@ -46,9 +46,11 @@ proxmox-tf/terraform-plugin-proxmox.log
 inventory.ini
 inventory.yml
 
-# Generated Kubeconfigs
+# Generated Kubeconfigs & Talosconfigs
 k3s.yaml
 proxmox-tf/k3s.yaml
+**/kubeconfig*
+**/talosconfig*
 
 # Local env vars
 env-vars.txt
