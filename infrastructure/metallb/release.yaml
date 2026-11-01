@@ -37,9 +37,4 @@ spec:
         limits:
           memory: 100Mi
       frr:
-        resources:
-          requests:
-            cpu: 20m
-            memory: 40Mi
-          limits:
-            memory: 100Mi
+        enabled: false

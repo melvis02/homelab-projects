@@ -23,6 +23,12 @@ spec:
     remediation:
       retries: 3
   values:
+    kubeControllerManager:
+      enabled: false
+    kubeScheduler:
+      enabled: false
+    kubeProxy:
+      enabled: false
     prometheus:
       prometheusSpec:
         securityContext:
