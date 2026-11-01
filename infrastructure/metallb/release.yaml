@@ -20,6 +20,8 @@ spec:
     crds: CreateReplace
   targetNamespace: metallb-system
   values:
+    frrk8s:
+      enabled: false
     controller:
       logLevel: info
       resources:
