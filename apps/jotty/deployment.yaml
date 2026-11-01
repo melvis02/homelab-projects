@@ -30,7 +30,7 @@ spec:
           runAsUser: 0
       containers:
       - name: jotty
-        image: ghcr.io/fccview/jotty:latest
+        image: ghcr.io/fccview/jotty:1.29.2
         imagePullPolicy: IfNotPresent
         securityContext:
           runAsUser: 1000
